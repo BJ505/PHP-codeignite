@@ -214,20 +214,16 @@
                 <button id="menuToggle">&#9776;</button>
             </li>
             <li class="menu-item hidden"><a href="#">Home</a></li>
-            <li class="menu-item hidden"><a href="https://codeigniter.com/user_guide/" target="_blank">Docs</a>
-            </li>
-            <li class="menu-item hidden"><a href="https://forum.codeigniter.com/" target="_blank">Community</a></li>
-            <li class="menu-item hidden"><a
-                    href="https://codeigniter.com/contribute" target="_blank">Contribute</a>
-            </li>
+            <li class="menu-item hidden"><a href="/solutoria/public/indicadores">Indicadores UF</a>
         </ul>
     </div>
 
     <div class="heroe">
 
-        <h1>Welcome to CodeIgniter <?= CodeIgniter\CodeIgniter::CI_VERSION ?></h1>
+        <h1>¡Hola! Soy Byron Jaramillo</h1>
 
-        <h2>The small framework with powerful features</h2>
+        
+
 
     </div>
 
@@ -237,17 +233,11 @@
 
 <section>
 
-    <h1>About this page</h1>
+    <h1>Esta prueba la hice con</h1>
 
-    <p>The page you are looking at is being generated dynamically by CodeIgniter.</p>
-
-    <p>If you would like to edit this page you will find it located at:</p>
-
-    <pre><code>app/Views/welcome_message.php</code></pre>
-
-    <p>The corresponding controller for this page can be found at:</p>
-
-    <pre><code>app/Controllers/Home.php</code></pre>
+    <h2>- PHP 8.1.29</h2>
+    <h2>- CodeIgniter 4.5.5</h2>
+    <h2>- MySql</h2>
 
 </section>
 
