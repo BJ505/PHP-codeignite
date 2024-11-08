@@ -16,7 +16,6 @@ class Indicadores extends BaseController{
 
     public function create()
     {
-
         helper(['form', 'url']);
 
         $model = new Indicador();
@@ -39,15 +38,21 @@ class Indicadores extends BaseController{
         else{
             echo json_encode(array("status" => false , 'data' => $data));
         }
-
-        
-        
-        
-        
-        
-        
-        
     }
 
+    public function update($id = null){
+        $model = new Indicador();
 
+        $data = $model->where('id', $id)->first();
+
+        if($data){
+            echo json_encode(array("status" => true , 'data' => $data));
+        }else{
+            echo json_encode(array("status" => false));
+        }
+    }
+
+    public function delete(){
+        // $model = new Indicador();
+    }
 }

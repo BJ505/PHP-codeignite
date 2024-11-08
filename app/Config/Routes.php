@@ -12,3 +12,5 @@ $routes->get('/', 'Home::index');
  */
 $routes->get('indicadores', 'Indicadores::index');
 $routes->post('create', 'Indicadores::create');
+$routes->get('update/(:num)', 'Indicadores::update/$1');
+$routes->get('delete/(:num)', 'Indicadores::delete/$1');

@@ -214,7 +214,7 @@
                 <button id="menuToggle">&#9776;</button>
             </li>
             <li class="menu-item hidden"><a href="#">Home</a></li>
-            <li class="menu-item hidden"><a href="/solutoria/public/indicadores">Indicadores UF</a>
+            <li class="menu-item hidden"><a href="/PHP-codeignite/public/indicadores">Indicadores UF</a>
         </ul>
     </div>
 

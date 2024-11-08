@@ -68,16 +68,67 @@
                     <td><?=$uf['tiempoIndicador'];?></td>
                     <td><?=$uf['origenIndicador'];?></td>
                     <td>
-                        <a data-id="<?=$uf['id'];?>" class="btn btn-primary">Editar</a>
-                        <a data-id="<?=$uf['id'];?>" class="btn btn-danger">Eliminar</a>
+                        <a data-id="<?=$uf['id'];?>" class="btn btn-primary btnUpdate">Editar</a>
+                        <a data-id="<?=$uf['id'];?>" class="btn btn-danger btnDelete">Eliminar</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
     </div>
-    <!-- Modal -->
+    <!-- Modal Add-->
     <div class="modal fade" id="addIndicadorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Agregar nuevo indicador UF</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="addIndicador" name="addIndicador" action="<?php echo site_url('/create');?>" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <div class="form-group">
+                                <label for="txtNombreIndicador" class="form-label">Nombre</label>
+                                <input type="text" name="txtNombreIndicador" class="form-control" id="txtNombreIndicador">
+                            </div>
+                            <div class="form-group">
+                                <label for="txtCodigoIndicador" class="form-label">Codigo</label>
+                                <input type="text" name="txtCodigoIndicador" class="form-control" id="txtCodigoIndicador">
+                            </div>
+                            <div class="form-group">
+                                <label for="txtnidadMedidaIndicador" class="form-label">Unidad de Medida</label>
+                                <input type="text" name="txtnidadMedidaIndicador" class="form-control" id="txtnidadMedidaIndicador">
+                            </div>
+                            <div class="form-group">
+                                <label for="numValorIndicador" class="form-label">Valor</label>
+                                <input type="number" name="numValorIndicador" class="form-control" id="numValorIndicador" aria-describedby="valorHelper">
+                                <div id="valorHelper" class="form-text">Separar decimales con punto "."</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="dateFechaIndicador" class="form-label">Fecha</label>
+                                <input type="date" name="dateFechaIndicador" class="form-control" id="dateFechaIndicador">
+                            </div>
+                            <div class="form-group">
+                                <label for="txtTiempoIndicador" class="form-label">Tiempo</label>
+                                <input type="text" name="txtTiempoIndicador" class="form-control" id="txtTiempoIndicador">
+                            </div>
+                            <div class="form-group">
+                                <label for="txtOrigenIndicador" class="form-label">Origen</label>
+                                <input type="text" name="txtOrigenIndicador" class="form-control" id="txtOrigenIndicador">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End modal Add -->
+     <!-- Modal Update-->
+    <div class="modal fade" id="updateIndicadorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -189,6 +240,48 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
                     }
                 });
             }
+        });
+
+        //Botón de editar registro
+        $(".btnUpdate").on('click', function(){
+            let idIndicador = $(this).attr('data-id');
+
+            $.ajax({
+                url: 'update/'+idIndicador,
+                type: 'GET',
+                dataType: 'JSON',
+                success: function (res){
+                    let data = res.data
+                    $('#updateIndicadorModal').modal('show');
+                    $('#updateIndicadorModal #txtNombreIndicador').val(data.nombreIndicador);
+                    $('#updateIndicadorModal #txtCodigoIndicador').val(data.codigoIndicador);
+                    $('#updateIndicadorModal #txtnidadMedidaIndicador').val(data.unidadMedidaIndicador);
+                    $('#updateIndicadorModal #numValorIndicador').val(data.valorIndicador);
+                    $('#updateIndicadorModal #dateFechaIndicador').val(data.fechaIndicador);
+                    $('#updateIndicadorModal #txtTiempoIndicador').val(data.tiempoIndicador);
+                    $('#updateIndicadorModal #txtOrigenIndicador').val(data.origenIndicador);
+
+                    console.log(res);
+                }, error: function (data) {
+                    console.log(data);
+                }
+            })
+        });
+
+        //Botón de editar registro
+        $(".btnDelete").on('click', function(){
+            let idIndicador = $(this).attr('data-id');
+
+            $.ajax({
+                url: 'delete/'+idIndicador,
+                type: 'GET',
+                dataType: 'JSON',
+                success: function (res){
+                    console.log(res);
+                }, error: function (data) {
+                    console.log(data);
+                }
+            })
         });
     });
 </script>
