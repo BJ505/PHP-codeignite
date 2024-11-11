@@ -4,7 +4,13 @@ namespace App\Controllers;
 use App\Models\Indicador;
 
 class Indicadores extends BaseController{
-
+    // En este archivo tenemos las funcionalidades claves del CRUD. Una leve descripción de cada una:
+    // 
+    // index: obtener todos los registros
+    // create: crear registro según información del formulario
+    // getData: obtener datos del registro según id seleccionado
+    // update: actualizar datos del registro según los nuevos ingresados en el formulario
+    // delete: Eliminar registro de la base de datos
     public function index()
     {
 

@@ -181,7 +181,6 @@
 </head>
 <!-- HEADER: MENU SECTION -->
 <header>
-
     <div class="menu">
         <ul>
             <li class="logo">
@@ -207,6 +206,7 @@
             </div>
         </div>
         <button type="button" class="btn btn-success" data-bs-toggle="modal"data-bs-target="#addIndicadorModal">Agregar indicador</button>
+        <!-- Tabla de inficadores UF -->
         <table class="table display" id="tblIndicadorUF">
             <thead>
                 <tr>
@@ -222,22 +222,23 @@
                 </tr>
             </thead>
             <tbody>
-            <?php foreach($indicadores as $uf): ?>
-                <tr id="tr<?=$uf['id'];?>">
-                    <th scope="row"><?=$uf['id'];?></th>
-                    <td><?=$uf['nombreIndicador'];?></td>
-                    <td><?=$uf['codigoIndicador'];?></td>
-                    <td><?=$uf['unidadMedidaIndicador'];?></td>
-                    <td><?=$uf['valorIndicador'];?></td>
-                    <td><?=$uf['fechaIndicador'];?></td>
-                    <td><?=$uf['tiempoIndicador'];?></td>
-                    <td><?=$uf['origenIndicador'];?></td>
-                    <td>
-                        <a data-id="<?=$uf['id'];?>" class="btn btn-primary btnUpdate">Editar</a>
-                        <a data-id="<?=$uf['id'];?>" class="btn btn-danger btnDelete">Eliminar</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
+                <!-- iteramos todos los registros armando la estructura de cada row -->
+                <?php foreach($indicadores as $uf): ?>
+                    <tr id="tr<?=$uf['id'];?>">
+                        <th scope="row"><?=$uf['id'];?></th>
+                        <td><?=$uf['nombreIndicador'];?></td>
+                        <td><?=$uf['codigoIndicador'];?></td>
+                        <td><?=$uf['unidadMedidaIndicador'];?></td>
+                        <td><?=$uf['valorIndicador'];?></td>
+                        <td><?=$uf['fechaIndicador'];?></td>
+                        <td><?=$uf['tiempoIndicador'];?></td>
+                        <td><?=$uf['origenIndicador'];?></td>
+                        <td>
+                            <a data-id="<?=$uf['id'];?>" class="btn btn-primary btnUpdate">Editar</a>
+                            <a data-id="<?=$uf['id'];?>" class="btn btn-danger btnDelete">Eliminar</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
@@ -343,21 +344,19 @@
             </div>
         </div>
     </div>
+    <!-- End modal Update -->
 </body>
+
 <!-- FOOTER: DEBUG INFO + COPYRIGHTS -->
-
 <footer>
-
     <div class="copyrights">
-
         <p>&copy; <?= date('Y') ?> <a href="https://bjaramillo.cl" target="_blank" style="color:white;">bjaramillo.cl</a></p>
-
     </div>
-
 </footer>
 
 <!-- Deje todo en esta página en esta oportunidad ya que el proyecto es pequeño.
-Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el código script Jquery en un archivo aparte, al igual que el head y footer de la página, cada uno en su propio archivo. -->
+Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el código script Jquery en un archivo aparte, al igual que el 
+head y footer de la página, cada uno en su propio archivo. -->
 <script>
     $(document).ready(function(){
         //Inicializar tabla con DataTables
@@ -372,6 +371,7 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
 
         //Formulario addIndicador
         $("#addIndicador").validate({
+            //Validaciones
             errorPlacement: function(label, element) {
                 label.addClass('validation');
                 label.insertAfter(element);
@@ -391,7 +391,6 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
             },
             submitHandler: function(form){
                 var form_action = $("#addIndicador").attr("action");
-                console.log("nice");
                 $.ajax({
                     data: $('#addIndicador').serialize(),
                     url: form_action,
@@ -399,7 +398,8 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
                     dataType: 'json',
                     success: function (res) {
                         let data = res.data;
-                        console.log(data);
+                        // console.log(data);
+                        //Armamos el registro recien creado para agregar a la tabla
                         var indicador = '<tr>';
                         indicador += '<th scope="row">'+ data.id + '</td>';
                         indicador += '<td>' + data.nombreIndicador + '</td>';
@@ -411,8 +411,11 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
                         indicador += '<td>' + data.origenIndicador + '</td>';
                         indicador += '<td><a data-id="'+ data.id +'" class="btn btn-primary">Editar</a><a data-id="'+ data.id +'" class="btn btn-danger">Eliminar</a></td>';
                         indicador += '</tr>';            
+                        // Lo agregamos a la tabla
                         $('#tblIndicadorUF tbody').prepend(indicador);
+                        // reseteamos el formulario
                         $('#addIndicador')[0].reset();
+                        // forzamos el cierre del modal
                         $('#addIndicadorModal').modal('hide');
                     },
                         error: function (data) {
@@ -423,6 +426,7 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
 
         //Botón de editar registro
         $(".btnUpdate").on('click', function(){
+            //Obtenemos el id del registro
             let idIndicador = $(this).attr('data-id');
 
             $.ajax({
@@ -447,8 +451,9 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
                 }
             })
         });
-
+        
         $("#updateIndicador").validate({
+            // validaciones
             rules: {
                 txtNombreIndicador: "required",
                 txtCodigoIndicador: "required",
@@ -469,6 +474,7 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
                     dataType: 'json',
                     success: function (res) {
                         let data = res.data;
+                        // agregamos a un array la esctructura de la fila actualizada
                         newData = [
                             '<th scope="row">'+ data.id + '</td>',
                             '<td>' + data.nombreIndicador + '</td>',
@@ -480,9 +486,11 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
                             '<td>' + data.origenIndicador + '</td>',
                             '<td><a data-id="'+ data.id +'" class="btn btn-primary">Editar</a><a data-id="'+ data.id +'" class="btn btn-danger">Eliminar</a></td>'
                         ]
-                        //Actualizar registro en la tabla
+                        // actualizar registro en la tabla con nueva info
                         table.row( "#tr"+data.id ).data( newData ).draw();
+                        // reseteamos el formulario
                         $('#updateIndicador')[0].reset();
+                        // forzamos el cierre del modal
                         $('#updateIndicadorModal').modal('hide');
                     },
                         error: function (data) {
@@ -493,11 +501,11 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
 
         //Botón de eliminar registro
         $(".btnDelete").on('click', function(){
+            //Obtenemos el id
             let idIndicador = $(this).attr('data-id');
-
+            //Eliminamos el registro y lo quitamos de la tabla
             $.get('delete/'+idIndicador, function (data) {
                 table.row( "#tr"+idIndicador ).remove().draw();
-
             })
         });
     });
