@@ -174,9 +174,12 @@
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
     <!-- jquery validate -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script>
-    <!-- traduccion spanish -->
+    <!-- traduccion de validaciones -->
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/localization/messages_es.js"></script>
-
+    <!-- traduccion de datepicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.1/i18n/jquery.ui.datepicker-es.min.js" crossorigin="anonymous"></script>
+    <!-- Chart JS -->
+    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
     
 </head>
 <!-- HEADER: MENU SECTION -->
@@ -202,10 +205,26 @@
     <div class="container">
         <div class="row">
             <div style="text-align: center;">
-                <h1>Indicadores de UF</h1>
+                <h1>Indicadores</h1>
             </div>
         </div>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal"data-bs-target="#addIndicadorModal">Agregar indicador</button>
+        <div class="row">
+            <div class="col-2">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal"data-bs-target="#addIndicadorModal">Agregar indicador</button>
+            </div>
+            <div class="col-1">
+                <label style="text-align:right;">Fecha min:</label>
+            </div>
+            <div class="col-3">
+                <input class="date_range_filter date" type="text" id="datepicker_from" />
+            </div>
+            <div class="col-1">
+                <label style="text-align:right;">Fecha max:</label>
+            </div>
+            <div class="col-3">
+                <input class="date_range_filter date" type="text" id="datepicker_to" />
+            </div>
+        </div>
         <!-- Tabla de inficadores UF -->
         <table class="table display" id="tblIndicadorUF">
             <thead>
@@ -241,6 +260,7 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <div id="chartContainer" style="height: 370px; width: 100%;"></div>
     </div>
     <!-- Modal Add-->
     <div class="modal fade" id="addIndicadorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -359,6 +379,7 @@ Claro que, a medida que el proyecto escale, subdividiría muchas cosas, el códi
 head y footer de la página, cada uno en su propio archivo. -->
 <script>
     $(document).ready(function(){
+
         //Inicializar tabla con DataTables
         let table = new DataTable('#tblIndicadorUF',{
             //Integramos traducción de DataTables
@@ -366,8 +387,133 @@ head y footer de la página, cada uno en su propio archivo. -->
                 url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json',
             }
         });
-
         
+        // Inicializar fechas de rango
+        minDateFilter = "";
+        maxDateFilter = "";
+
+        //Inicializamos datepicker FROM
+        $("#datepicker_from").datepicker({
+            dateFormat: 'yy-mm-dd', //Seteo fecha en formato
+            changeYear: true, //Disponible cambiar el años
+            changeMonth: true, //Disponible cambiar mes
+            maxDate: '0', //Fecha max HOY
+            "onSelect": function(date) {
+            minDateFilter = new Date(date).getTime();
+            //ejecutar función draw de datatables
+            table.draw();
+            }
+        }).keyup(function() {
+            minDateFilter = new Date(this.value).getTime();
+            //ejecutar función draw de datatables
+            table.draw();
+        });
+
+        $("#datepicker_to").datepicker({
+            dateFormat: 'yy-mm-dd', //Seteo fecha en formato
+            changeYear: true, //Disponible cambiar el años
+            changeMonth: true, //Disponible cambiar mes
+            maxDate: '0', //Fecha max HOY
+            "onSelect": function(date) {
+            maxDateFilter = new Date(date).getTime();
+            //ejecutar función draw de datatables
+            table.draw();
+            }
+        }).keyup(function() {
+            maxDateFilter = new Date(this.value).getTime();
+            //ejecutar función draw de datatables
+            table.draw();
+        });
+
+        // Se agrega lógica de rango de fechas a los filtros de la tabla
+        $.fn.dataTableExt.afnFiltering.push(
+            function(oSettings, aData, iDataIndex) {
+                if (typeof aData._date == 'undefined') {
+                aData._date = new Date(aData[5]).getTime();
+                }
+
+                if (minDateFilter && !isNaN(minDateFilter)) {
+                if (aData._date < minDateFilter) {
+                    return false;
+                }
+                }
+                
+                if (maxDateFilter && !isNaN(maxDateFilter)) {
+                if (aData._date > maxDateFilter) {
+                    return false;
+                }
+                }
+
+                return true;
+            }
+        );
+
+        // actualizar chart por cada cambio de visualización en la tabla (incluye toda la data filtrada)
+        table.on( 'draw', function () {
+            let tableData = table.rows({ filter : 'applied' }).data();
+            //UF
+            let sumUF=0;
+            let sumCantUF = 0;
+            //Dolar
+            let sumDolar=0;
+            let sumCantDolar = 0;
+            //Euro
+            let sumEuro=0;
+            let sumCantEuro = 0;
+            //UTM
+            let sumUTM=0;
+            let sumCantUTM = 0;
+            //Se suma el total de los datos y se agrega un contador para dividir y sacar promedio
+            tableData.each(function( index ){
+                if(index[2]=='UF' && index[3]=='Pesos'){
+                    sumUF+= parseInt(index[4]);
+                    sumCantUF++;
+                }else if(index[2]=='DOLAR' && index[3]=='Pesos'){
+                    sumDolar+= parseInt(index[4]);
+                    sumCantDolar++;
+                }else if(index[2]=='EURO' && index[3]=='Pesos'){
+                    sumEuro+= parseInt(index[4]);
+                    sumCantEuro++;
+                }else if(index[2]=='UTM' && index[3]=='Pesos'){
+                    sumUTM+= parseInt(index[4]);
+                    sumCantUTM++;
+                }
+            });
+            // Calculo de promedios
+            let totalUF = truncateDecimals((sumUF/sumCantUF), 2);
+            let totalDolar = truncateDecimals((sumDolar/sumCantDolar), 2);
+            let totalEuro = truncateDecimals((sumEuro/sumCantEuro), 2);
+            let totalUTM = truncateDecimals((sumUTM/sumCantUTM), 2);
+            // console.log(totalUF, totalDolar, totalEuro, totalUTM);
+
+            //Inicialización del Chart según data after draw
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                exportEnabled: true,
+                title:{
+                    text: "Promedio valor de principales Códigos"
+                },
+                subtitles: [{
+                    text: "En donde Un. medida sea igual a Pesos"
+                }],
+                data: [{
+                    type: "pie",
+                    showInLegend: "true",
+                    legendText: "{label}",
+                    indexLabelFontSize: 16,
+                    indexLabel: "{label}",
+                    yValueFormatString: "$#,##0",
+                    dataPoints: [
+                        { y: totalUF, label: "Prom. UF" },
+                        { y: totalDolar, label: "Prom. Dolar" },
+                        { y: totalEuro, label: "Prom. Euro" },
+                        { y: totalUTM, label: "Prom. UTM" }
+                    ]
+                }]
+            });            
+            //Render chart
+            chart.render();
+        });
 
         //Formulario addIndicador
         $("#addIndicador").validate({
@@ -390,6 +536,7 @@ head y footer de la página, cada uno en su propio archivo. -->
 
             },
             submitHandler: function(form){
+                //obtener action directo del form
                 var form_action = $("#addIndicador").attr("action");
                 $.ajax({
                     data: $('#addIndicador').serialize(),
@@ -466,6 +613,7 @@ head y footer de la página, cada uno en su propio archivo. -->
                 messages: {
             },
             submitHandler: function(form) {
+                //obtenemos action directo del form
                 var form_action = $("#updateIndicador").attr("action");
                 $.ajax({
                     data: $('#updateIndicador').serialize(),
@@ -509,6 +657,14 @@ head y footer de la página, cada uno en su propio archivo. -->
             })
         });
     });
+    //Función para truncar numeros según cantidad de decimales señalados
+    truncateDecimals = function (number, digits) {
+        var multiplier = Math.pow(10, digits),
+            adjustedNum = number * multiplier,
+            truncatedNum = Math[adjustedNum < 0 ? 'ceil' : 'floor'](adjustedNum);
+
+        return truncatedNum / multiplier;
+    };
 </script>
 </html>
 
