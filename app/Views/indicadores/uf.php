@@ -195,7 +195,7 @@
                 <button id="menuToggle">&#9776;</button>
             </li>
             <li class="menu-item hidden"><a href="<?=base_url();?>">Home</a></li>
-            <li class="menu-item hidden"><a href="<?=base_url();?>indicadores">Indicadores UF</a>
+            <li class="menu-item hidden"><a href="<?=base_url();?>indicadores">Indicadores</a>
         </ul>
     </div>
 </header>
